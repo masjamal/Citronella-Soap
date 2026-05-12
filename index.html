@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Bidoyi Citronella - Sabun Herbal Alami</title>
+    <script>
+      // Fix for "Cannot set property fetch of #<Window> which has only a getter"
+      // This occurs when a library (e.g. whatwg-fetch) tries to assign to 'window.fetch'
+      // in environments where it is defined as a non-writable property.
+      (function() {
+        try {
+          var _fetch = window.fetch;
+          Object.defineProperty(window, 'fetch', {
+            get: function() { return _fetch; },
+            set: function(v) { _fetch = v; },
+            enumerable: true,
+            configurable: true
+          });
+        } catch (e) {
+          // Fallback - ignore if it's strictly read-only and unconfigurable
+        }
+      })();
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
+
