@@ -1,0 +1,31 @@
+{
+  "entities": {
+    "User": {
+      "title": "User Profile",
+      "description": "User account data including roles and referral info",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string", "description": "Firebase Auth unique ID" },
+        "name": { "type": "string" },
+        "email": { "type": "string", "format": "email" },
+        "phone": { "type": "string" },
+        "role": { 
+          "type": "string", 
+          "enum": ["super_admin", "admin", "reseller", "affiliate", "customer"] 
+        },
+        "referral_code": { "type": "string" },
+        "marketplace_link": { "type": "string" },
+        "profile_picture": { "type": "string" },
+        "is_active": { "type": "boolean" },
+        "created_at": { "type": "string", "format": "date-time" }
+      },
+      "required": ["uid", "name", "email", "role", "is_active", "created_at"]
+    }
+  },
+  "firestore": {
+    "users/{userId}": {
+      "schema": "User",
+      "description": "Information about a specific user account"
+    }
+  }
+}
