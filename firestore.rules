@@ -1,0 +1,52 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Default deny
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Helper functions
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function isValidUser(data) {
+      return data.keys().hasAll(['uid', 'name', 'email', 'role', 'is_active', 'created_at']) &&
+             data.uid is string &&
+             data.name is string &&
+             data.name.size() <= 100 &&
+             data.email is string &&
+             data.role in ['super_admin', 'admin', 'reseller', 'affiliate', 'customer'] &&
+             data.is_active is bool;
+    }
+
+    match /users/{userId} {
+      allow get: if isOwner(userId);
+      allow list: if isSignedIn() && resource.data.uid == request.auth.uid;
+      
+      allow create: if isSignedIn() && 
+                      request.auth.uid == userId && 
+                      isValidUser(request.resource.data) &&
+                      request.resource.data.role == 'customer';
+      
+      allow update: if isOwner(userId) && 
+                      isValidUser(request.resource.data) &&
+                      request.resource.data.role == resource.data.role &&
+                      request.resource.data.uid == resource.data.uid &&
+                      incoming().diff(existing()).affectedKeys().hasOnly(['name', 'phone', 'profile_picture', 'marketplace_link']); // Limited updates
+    }
+
+    match /referral_codes/{code} {
+      function isValidReferral(data) {
+        return data.keys().hasAll(['ownerId']) && data.keys().size() == 1 && data.ownerId is string;
+      }
+      allow get: if isSignedIn();
+      allow create: if isSignedIn() && request.auth.uid == request.resource.data.ownerId && isValidReferral(request.resource.data);
+    }
+  }
+}

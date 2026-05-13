@@ -18,9 +18,28 @@ import {
 import { UserRole } from '../types';
 
 export const Dashboard = () => {
-  const { profile, logout } = useAuth();
+  const { profile, logout, user } = useAuth();
   
-  if (!profile) return null;
+  if (!profile) {
+    if (user) {
+      return (
+        <div className="min-h-screen flex items-center justify-center bg-brand-light p-6">
+          <div className="max-w-md w-full bg-white p-8 rounded-3xl shadow-xl border border-brand-soft text-center">
+            <ShieldAlert className="w-16 h-16 text-amber-500 mx-auto mb-4" />
+            <h2 className="text-2xl font-bold text-slate-800 mb-2">Profil Tidak Ditemukan</h2>
+            <p className="text-slate-600 mb-6">Akun Anda terdeteksi, namun data profil member belum tersedia. Silakan hubungi admin atau coba daftar ulang.</p>
+            <button 
+              onClick={logout}
+              className="w-full bg-brand-green text-white py-3 rounded-xl font-bold hover:bg-[#1B3518] transition-all"
+            >
+              Keluar & Coba Lagi
+            </button>
+          </div>
+        </div>
+      );
+    }
+    return null;
+  }
 
   const getDashboardTitle = (role: UserRole) => {
     switch (role) {
@@ -32,7 +51,9 @@ export const Dashboard = () => {
     }
   };
 
-  const referralUrl = `${window.location.origin}/?ref=${profile.referral_code}`;
+  const referralUrl = profile.referral_code 
+    ? `${window.location.origin}/?ref=${profile.referral_code}`
+    : "Referral code tidak tersedia";
 
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text);

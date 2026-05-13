@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 import { useNavigate, Link, useLocation } from 'react-router-dom';
 import { signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
-import { auth, db } from '../lib/firebase';
-import { doc, getDoc } from 'firebase/firestore';
+import { auth, db, handleFirestoreError, OperationType } from '../lib/firebase';
+import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { motion } from 'motion/react';
 import { LogIn, Lock, Mail, ArrowRight, Leaf, Loader2, Home } from 'lucide-react';
+import { UserRole } from '../types';
 
 export const Login = () => {
   const [email, setEmail] = useState('');
@@ -24,7 +25,12 @@ export const Login = () => {
       await signInWithEmailAndPassword(auth, email, password);
       navigate(from, { replace: true });
     } catch (err: any) {
-      setError(err.message || 'Login failed. Please check your credentials.');
+      console.error("Login Error:", err);
+      if (err.code === 'auth/operation-not-allowed') {
+        setError('Metode login Email/Password belum diaktifkan di Firebase Console. Silakan gunakan Google Login atau aktifkan fitur ini di tab Authentication.');
+      } else {
+        setError(err.message || 'Login failed. Please check your credentials.');
+      }
     } finally {
       setLoading(false);
     }
@@ -32,20 +38,41 @@ export const Login = () => {
 
   const handleGoogleLogin = async () => {
     const provider = new GoogleAuthProvider();
+    setLoading(true);
     try {
       const result = await signInWithPopup(auth, provider);
-      // Check if profile exists
-      const userDoc = await getDoc(doc(db, 'users', result.user.uid));
-      if (!userDoc.exists()) {
-        // If no profile, they need to select a role or we default to customer
-        // For simplicity in this demo, let's redirect to register if they don't have a profile
-        // but technically they just logged in with Google.
-        // Actually, let's just send them to dashboard and the provider will handle profile fetching.
-        // If profile is null in provider, we might need a "complete profile" step.
+      const user = result.user;
+      
+      try {
+        const userDoc = await getDoc(doc(db, 'users', user.uid));
+        if (!userDoc.exists()) {
+          // Create basic profile for new Google user
+          const referralCode = user.displayName 
+            ? user.displayName.toLowerCase().replace(/[^a-z0-9]/g, '') + Math.floor(Math.random() * 1000)
+            : `user${user.uid.substring(0, 5)}`;
+            
+          const userProfile = {
+            uid: user.uid,
+            name: user.displayName || 'User',
+            email: user.email || '',
+            role: UserRole.CUSTOMER,
+            referral_code: referralCode,
+            is_active: true,
+            created_at: new Date().toISOString(),
+          };
+          
+          await setDoc(doc(db, 'users', user.uid), userProfile);
+          await setDoc(doc(db, 'referral_codes', referralCode), { ownerId: user.uid });
+        }
+      } catch (err) {
+        handleFirestoreError(err, OperationType.WRITE, `users/${user.uid}`);
       }
       navigate(from, { replace: true });
     } catch (err: any) {
+      console.error("Google Auth Error:", err);
       setError(err.message || 'Google login failed.');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -109,6 +136,26 @@ export const Login = () => {
               Masuk Sekarang
             </button>
           </form>
+
+          <div className="mt-6">
+            <div className="relative mb-6">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-slate-100"></div>
+              </div>
+              <div className="relative flex justify-center text-xs uppercase">
+                <span className="bg-white px-2 text-slate-400 font-medium tracking-widest">Atau masuk dengan</span>
+              </div>
+            </div>
+
+            <button
+              onClick={handleGoogleLogin}
+              disabled={loading}
+              className="w-full bg-slate-50 hover:bg-slate-100 text-slate-700 font-bold py-4 rounded-2xl border border-slate-100 flex items-center justify-center gap-3 transition-all active:scale-95 disabled:opacity-70"
+            >
+              <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" className="w-5 h-5" />
+              Google Akun
+            </button>
+          </div>
 
           <div className="mt-8 flex flex-col items-center justify-center gap-4 text-sm">
             <div className="flex items-center gap-2">

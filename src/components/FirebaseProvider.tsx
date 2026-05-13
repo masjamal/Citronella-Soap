@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { onAuthStateChanged, User } from 'firebase/auth';
 import { doc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore';
-import { auth, db } from '../lib/firebase';
+import { auth, db, handleFirestoreError, OperationType } from '../lib/firebase';
 import { UserProfile, UserRole } from '../types';
 
 interface AuthContextType {
@@ -28,11 +28,10 @@ export const FirebaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
           if (userDoc.exists()) {
             setProfile(userDoc.data() as UserProfile);
           } else {
-            // Handle case where auth exists but no profile yet (e.g. midway through registration)
             setProfile(null);
           }
         } catch (error) {
-          console.error("Error fetching user profile:", error);
+          handleFirestoreError(error, OperationType.GET, `users/${firebaseUser.uid}`);
           setProfile(null);
         }
       } else {

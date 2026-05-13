@@ -26,6 +26,17 @@
     "users/{userId}": {
       "schema": "User",
       "description": "Information about a specific user account"
+    },
+    "referral_codes/{code}": {
+      "schema": {
+        "title": "Referral Code Registry",
+        "type": "object",
+        "properties": {
+          "ownerId": { "type": "string" }
+        },
+        "required": ["ownerId"]
+      },
+      "description": "Registry to ensure referral code uniqueness and enable lookup"
     }
   }
 }

@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
-import { doc, setDoc, getDocs, collection, query, where, serverTimestamp } from 'firebase/firestore';
-import { auth, db } from '../lib/firebase';
+import { doc, setDoc, getDoc, serverTimestamp } from 'firebase/firestore';
+import { auth, db, handleFirestoreError, OperationType } from '../lib/firebase';
 import { motion } from 'motion/react';
 import { UserPlus, Lock, Mail, User, Phone, ArrowRight, Leaf, Loader2, Home } from 'lucide-react';
 import { UserRole } from '../types';
@@ -23,11 +23,14 @@ export const Register = () => {
     let counter = 1;
     
     while (true) {
-      const q = query(collection(db, 'users'), where('referral_code', '==', code));
-      const snapshot = await getDocs(q);
-      if (snapshot.empty) break;
-      code = `${slug}${counter}`;
-      counter++;
+      try {
+        const refDoc = await getDoc(doc(db, 'referral_codes', code));
+        if (!refDoc.exists()) break;
+        code = `${slug}${counter}`;
+        counter++;
+      } catch (err) {
+        handleFirestoreError(err, OperationType.GET, `referral_codes/${code}`);
+      }
     }
     return code;
   };
@@ -52,16 +55,28 @@ export const Register = () => {
         name,
         email,
         phone,
-        role: UserRole.CUSTOMER, // Default role
+        role: UserRole.CUSTOMER,
         referral_code: referralCode,
         is_active: true,
-        created_at: new Date().toISOString(), // Or serverTimestamp but blueprint needs format check if we strictly adhere
+        created_at: new Date().toISOString(),
       };
       
-      await setDoc(doc(db, 'users', user.uid), userProfile);
+      try {
+        // Atomic write (ideally a writeBatch, but for simplicity here)
+        await setDoc(doc(db, 'users', user.uid), userProfile);
+        await setDoc(doc(db, 'referral_codes', referralCode), { ownerId: user.uid });
+      } catch (err) {
+        handleFirestoreError(err, OperationType.WRITE, `users/${user.uid} or referral_codes/${referralCode}`);
+      }
+
       navigate('/dashboard');
     } catch (err: any) {
-      setError(err.message || 'Pendaftaran gagal.');
+      console.error("Auth Error:", err);
+      if (err.code === 'auth/operation-not-allowed') {
+        setError('Metode pendaftaran Email/Password belum diaktifkan di Firebase Console. Silakan hubungi admin atau aktifkan di tab Authentication proyek Anda.');
+      } else {
+        setError(err.message || 'Pendaftaran gagal.');
+      }
     } finally {
       setLoading(false);
     }
