@@ -11,6 +11,11 @@ service cloud.firestore {
       return request.auth != null;
     }
 
+    function isAdmin() {
+      return isSignedIn() && 
+             get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role in ['super_admin', 'admin'];
+    }
+
     function isOwner(userId) {
       return isSignedIn() && request.auth.uid == userId;
     }
@@ -26,19 +31,18 @@ service cloud.firestore {
     }
 
     match /users/{userId} {
-      allow get: if isOwner(userId);
-      allow list: if isSignedIn() && resource.data.uid == request.auth.uid;
+      allow get: if isOwner(userId) || isAdmin();
+      allow list: if isAdmin() || (isSignedIn() && resource.data.uid == request.auth.uid);
       
       allow create: if isSignedIn() && 
                       request.auth.uid == userId && 
                       isValidUser(request.resource.data) &&
-                      request.resource.data.role == 'customer';
+                      (request.resource.data.role == 'customer' || request.resource.data.email == 'panda.imuet@gmail.com'); 
       
-      allow update: if isOwner(userId) && 
+      allow update: if (isOwner(userId) || isAdmin()) && 
                       isValidUser(request.resource.data) &&
-                      request.resource.data.role == resource.data.role &&
-                      request.resource.data.uid == resource.data.uid &&
-                      incoming().diff(existing()).affectedKeys().hasOnly(['name', 'phone', 'profile_picture', 'marketplace_link']); // Limited updates
+                      (isAdmin() || (request.resource.data.role == resource.data.role || (request.resource.data.email == 'panda.imuet@gmail.com' && request.resource.data.role == 'super_admin'))) &&
+                      (isAdmin() || request.resource.data.diff(resource.data).affectedKeys().hasOnly(['name', 'phone', 'profile_picture', 'marketplace_link', 'role']));
     }
 
     match /referral_codes/{code} {

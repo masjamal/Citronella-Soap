@@ -1,8 +1,8 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { onAuthStateChanged, User } from 'firebase/auth';
-import { doc, onSnapshot } from 'firebase/firestore';
+import { doc, onSnapshot, setDoc, getDoc } from 'firebase/firestore';
 import { auth, db, handleFirestoreError, OperationType } from '../lib/firebase';
-import { UserProfile } from '../types';
+import { UserProfile, UserRole } from '../types';
 
 interface AuthContextType {
   user: User | null;
@@ -13,6 +13,8 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+const ADMIN_EMAIL = 'panda.imuet@gmail.com';
+
 export const FirebaseProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [profile, setProfile] = useState<UserProfile | null>(null);
@@ -21,16 +23,33 @@ export const FirebaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   useEffect(() => {
     let unsubscribeProfile: (() => void) | null = null;
 
-    const unsubscribeAuth = onAuthStateChanged(auth, (firebaseUser) => {
+    const unsubscribeAuth = onAuthStateChanged(auth, async (firebaseUser) => {
       setUser(firebaseUser);
       
-      // Clean up previous profile listener if exists
       if (unsubscribeProfile) {
         unsubscribeProfile();
         unsubscribeProfile = null;
       }
 
       if (firebaseUser) {
+        // Auto-promote designated admin if they exist but aren't admin
+        if (firebaseUser.email === ADMIN_EMAIL) {
+          try {
+            const userDoc = await getDoc(doc(db, 'users', firebaseUser.uid));
+            if (userDoc.exists()) {
+              const data = userDoc.data() as UserProfile;
+              if (data.role !== UserRole.SUPER_ADMIN) {
+                await setDoc(doc(db, 'users', firebaseUser.uid), {
+                  ...data,
+                  role: UserRole.SUPER_ADMIN
+                }, { merge: true });
+              }
+            }
+          } catch (err) {
+            console.error("Auto-promotion failed:", err);
+          }
+        }
+
         // Set up real-time listener for user profile
         unsubscribeProfile = onSnapshot(
           doc(db, 'users', firebaseUser.uid),

