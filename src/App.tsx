@@ -66,9 +66,8 @@ export default function App() {
               <span>100% Herbal Ingredients</span>
             </div>
             <h1 className="text-3xl md:text-4xl lg:text-5xl leading-tight mb-8 text-slate-900 font-display">
-              <span className="relative inline-block whitespace-nowrap">
-                <span className="relative z-10">Wajah Kusam & Berminyak?</span>
-                <span className="absolute bottom-1 left-0 w-full h-1/2 bg-yellow-300 -z-0 opacity-70"></span>
+              <span className="bg-[linear-gradient(to_top,#fde047_50%,transparent_50%)] box-decoration-clone px-1">
+                Wajah Kusam & Berminyak?
               </span>{' '}
               Saatnya Rawat Kulit dengan Sabun Herbal Alami
             </h1>
