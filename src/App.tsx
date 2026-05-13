@@ -66,7 +66,11 @@ export default function App() {
               <span>100% Herbal Ingredients</span>
             </div>
             <h1 className="text-3xl md:text-4xl lg:text-5xl leading-tight mb-8 text-slate-900 font-display">
-              Wajah Kusam & Berminyak? Saatnya Rawat Kulit dengan Sabun Herbal Alami
+              <span className="relative inline-block whitespace-nowrap">
+                <span className="relative z-10">Wajah Kusam & Berminyak?</span>
+                <span className="absolute bottom-1 left-0 w-full h-1/2 bg-yellow-300 -z-0 opacity-70"></span>
+              </span>{' '}
+              Saatnya Rawat Kulit dengan Sabun Herbal Alami
             </h1>
             <p className="text-lg md:text-xl text-slate-600 leading-relaxed mx-auto max-w-2xl">
               Sabun herbal dengan kombinasi minyak sereh merah, propolis, lemon, dan olive oil untuk membantu membersihkan wajah & tubuh setiap hari.
@@ -294,7 +298,7 @@ export default function App() {
               <div className="flex gap-1 mb-6">
                 {[...Array(5)].map((_, i) => <Star key={i} className="w-6 h-6 fill-yellow-400 text-yellow-400" />)}
               </div>
-              <p className="text-xl md:text-2xl italic mb-10 leading-relaxed font-medium">"{testi.text}"</p>
+              <p className="text-base md:text-lg italic mb-6 leading-relaxed font-medium">"{testi.text}"</p>
               <div className="flex items-center gap-4">
                 <div className="w-12 h-12 bg-brand-soft rounded-full flex items-center justify-center text-brand-green font-bold text-lg">
                   {testi.name[0]}
@@ -359,65 +363,107 @@ export default function App() {
           <p className="text-slate-600">Investasi terbaik untuk kulit masa depan Anda</p>
         </div>
 
-        <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-          {/* Paket Hemat */}
+        <div className="flex flex-col gap-8 max-w-2xl mx-auto">
+          {/* Paket 1 Pcs */}
           <motion.div 
-            whileHover={{ y: -10 }}
-            className="bg-white rounded-3xl p-8 border border-brand-soft shadow-xl relative overflow-hidden"
+            whileHover={{ y: -5 }}
+            className="bg-white rounded-[32px] p-8 border border-brand-soft shadow-xl relative overflow-hidden flex flex-col md:flex-row md:items-center gap-8"
           >
-            <div className="absolute top-0 right-0 bg-brand-soft text-brand-green text-xs font-bold px-6 py-2 rounded-bl-3xl">Hemat</div>
-            <h3 className="text-2xl mb-2">Paket 1 Pcs</h3>
-            <div className="text-sm text-slate-400 mb-6 font-medium">Netto 80 gram</div>
-            <div className="mb-8">
-              <div className="text-4xl font-display font-extrabold text-slate-900 leading-none">Rp55.000</div>
-              <div className="text-slate-400 line-through mt-1">Rp75.000</div>
+            <div className="absolute top-0 right-0 bg-brand-soft text-brand-green text-xs font-bold px-6 py-2 rounded-bl-2xl">Hemat</div>
+            <div className="flex-grow">
+              <h3 className="text-2xl font-bold text-slate-900 mb-1">Paket 1 Pcs</h3>
+              <div className="text-sm text-slate-400 mb-4 font-medium italic">Netto 80 gram</div>
+              <ul className="space-y-3">
+                <li className="flex items-center gap-3 text-slate-600 font-semibold">
+                  <CheckCircle2 className="w-5 h-5 text-brand-green shrink-0" /> 1 Bar Citronella Soap
+                </li>
+                <li className="flex items-center gap-3 text-slate-400 font-semibold">
+                  <CheckCircle2 className="w-5 h-5 opacity-20 shrink-0" /> Free Konsultasi
+                </li>
+              </ul>
             </div>
-            <ul className="space-y-4 mb-10">
-              <li className="flex items-center gap-3 text-slate-600 font-bold text-lg">
-                <CheckCircle2 className="w-6 h-6 text-brand-green" /> 1 Bar Bidoyi Citronella
-              </li>
-              <li className="flex items-center gap-3 text-slate-500 font-bold text-base">
-                <CheckCircle2 className="w-6 h-6 opacity-30" /> Free Konsultasi
-              </li>
-            </ul>
-            <a 
-              href={WA_LINK} 
-              className="flex items-center justify-center gap-2 w-full py-4 bg-brand-soft border-2 border-brand-green text-brand-green font-bold rounded-2xl hover:bg-brand-green hover:text-white transition-all"
-            >
-              Order Sekarang
-            </a>
+            <div className="md:text-right flex flex-col shrink-0">
+              <div className="mb-4">
+                <div className="text-slate-400 line-through text-sm">Rp75.000</div>
+                <div className="text-4xl font-display font-extrabold text-brand-green leading-none">Rp55.000</div>
+              </div>
+              <a 
+                href={WA_LINK} 
+                className="inline-flex items-center justify-center px-8 py-3 bg-brand-soft border-2 border-brand-green text-brand-green font-bold rounded-xl hover:bg-brand-green hover:text-white transition-all shadow-sm"
+              >
+                Order Paket 1 Pcs
+              </a>
+            </div>
+          </motion.div>
+
+          {/* Paket 3 Pcs */}
+          <motion.div 
+            whileHover={{ y: -5 }}
+            className="bg-brand-light rounded-[32px] p-8 border-2 border-brand-green shadow-2xl relative overflow-hidden flex flex-col md:flex-row md:items-center gap-8"
+          >
+            <div className="absolute top-0 right-0 bg-brand-green text-white text-xs font-bold px-6 py-2 rounded-bl-2xl">Paling Populer</div>
+            <div className="flex-grow">
+              <h3 className="text-2xl font-bold text-slate-900 mb-1">Paket 3 Pcs</h3>
+              <div className="text-sm text-brand-green mb-4 font-medium italic">Netto 3x 80 gram (Lebih Hemat)</div>
+              <ul className="space-y-3">
+                <li className="flex items-center gap-3 text-slate-700 font-bold">
+                  <CheckCircle2 className="w-6 h-6 text-brand-green shrink-0" /> 3 Bar Citronella Soap
+                </li>
+                <li className="flex items-center gap-3 text-slate-700 font-bold">
+                  <CheckCircle2 className="w-6 h-6 text-brand-green shrink-0" /> Free Konsultasi
+                </li>
+                <li className="flex items-center gap-3 text-slate-700 font-bold">
+                  <CheckCircle2 className="w-6 h-6 text-brand-green shrink-0" /> Free Ongkir (Area P. Jawa)
+                </li>
+              </ul>
+            </div>
+            <div className="md:text-right flex flex-col shrink-0">
+              <div className="mb-4">
+                <div className="text-slate-400 line-through text-sm">Rp225.000</div>
+                <div className="text-4xl font-display font-extrabold text-slate-900 leading-none">Rp160.000</div>
+              </div>
+              <a 
+                href={WA_LINK} 
+                className="inline-flex items-center justify-center px-8 py-4 bg-brand-green text-white font-bold rounded-xl hover:bg-[#1B3518] transition-all shadow-lg hover:shadow-brand-green/20"
+              >
+                Ambil Promo 3 Pcs
+              </a>
+            </div>
           </motion.div>
 
           {/* Paket Box */}
           <motion.div 
-            whileHover={{ y: -10 }}
-            className="bg-brand-green rounded-3xl p-8 border-4 border-brand-gold shadow-2xl relative overflow-hidden transform scale-105 z-10"
+            whileHover={{ y: -5 }}
+            className="bg-brand-green rounded-[32px] p-8 border-4 border-brand-gold shadow-2xl relative overflow-hidden flex flex-col md:flex-row md:items-center gap-8 text-white"
           >
-            <div className="absolute top-0 right-0 bg-brand-gold text-brand-green text-sm font-black px-6 py-2 rounded-bl-3xl uppercase tracking-tighter shadow-lg">Bestseller</div>
-            <h3 className="text-2xl mb-2 text-white">1 Box (Isi 5 Pcs)</h3>
-            <div className="text-sm text-brand-soft opacity-60 mb-6 font-medium">Stok Persediaan 1-2 Bulan</div>
-            <div className="mb-8">
-              <div className="text-xs text-white opacity-60 mb-1 uppercase tracking-widest font-bold">Promo Terbatas!</div>
-              <div className="text-5xl font-display font-extrabold text-white leading-none">Rp200.000</div>
-              <div className="text-white/40 line-through mt-1">Rp275.000</div>
+            <div className="absolute top-0 right-0 bg-brand-gold text-brand-green text-sm font-black px-6 py-2 rounded-bl-2xl uppercase tracking-tighter shadow-lg">Bestseller</div>
+            <div className="flex-grow">
+              <h3 className="text-2xl font-bold text-white mb-1">1 Box (Isi 5 Pcs)</h3>
+              <div className="text-sm text-brand-gold mb-4 font-medium italic">Stok Persediaan 1-2 Bulan</div>
+              <ul className="space-y-3">
+                <li className="flex items-center gap-3 font-bold text-lg">
+                  <CheckCircle2 className="w-6 h-6 text-brand-gold shrink-0" /> 5 Bar Citronella Soap
+                </li>
+                <li className="flex items-center gap-3 font-bold text-lg text-brand-soft">
+                  <CheckCircle2 className="w-6 h-6 text-brand-gold shrink-0" /> Harga lebih ekonomis
+                </li>
+                <li className="flex items-center gap-3 font-bold text-lg text-brand-soft">
+                  <CheckCircle2 className="w-6 h-6 text-brand-gold shrink-0" /> Free Ongkir (Area P. Jawa)
+                </li>
+              </ul>
             </div>
-            <ul className="space-y-4 mb-10">
-              <li className="flex items-center gap-3 text-white font-black text-xl">
-                <CheckCircle2 className="w-6 h-6 text-brand-gold" /> 5 Bar Bidoyi Citronella
-              </li>
-              <li className="flex items-center gap-3 text-brand-soft font-bold text-lg">
-                <CheckCircle2 className="w-6 h-6 text-brand-gold" /> Harga lebih ekonomis
-              </li>
-              <li className="flex items-center gap-3 text-brand-soft font-bold text-lg">
-                <CheckCircle2 className="w-6 h-6 text-brand-gold" /> Free Ongkir (Area P. Jawa)
-              </li>
-            </ul>
-            <a 
-              href={WA_LINK} 
-              className="flex items-center justify-center gap-3 w-full py-5 bg-brand-gold text-brand-green font-black rounded-2xl hover:bg-white hover:scale-105 transition-all shadow-xl shadow-black/20 text-lg uppercase"
-            >
-              Ambil Promo Sekarang
-            </a>
+            <div className="md:text-right flex flex-col shrink-0">
+              <div className="mb-4">
+                <div className="text-white/40 line-through text-sm">Rp275.000</div>
+                <div className="text-5xl font-display font-extrabold text-white leading-none">Rp200.000</div>
+              </div>
+              <a 
+                href={WA_LINK} 
+                className="inline-flex items-center justify-center px-8 py-4 bg-brand-gold text-brand-green font-black rounded-xl hover:scale-105 transition-all shadow-xl shadow-black/20 text-lg uppercase"
+              >
+                Ambil Promo Box
+              </a>
+            </div>
           </motion.div>
         </div>
 
